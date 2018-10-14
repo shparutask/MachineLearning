@@ -12,24 +12,22 @@ def create_chuncks(table):
         n = table.shape[0]    
         for i in range(5):
             begin = int(i * n / 5)
-            end = int((i + 1) * n / 5) - 1
+            end = int((i + 1) * n / 5)
             tests.append(table[begin:end])
             dropped_indexes = range(begin, end)
             trains.append(table.drop(table.index[dropped_indexes]))
         return trains, tests 
     
-def normalize(X):
-        for col in range(X.shape[1]):
-            if(pd.unique(X.iloc[:,col].values).size > 2):
-                avg = np.mean(X.iloc[:,col])
-                var = np.std(X.iloc[:,col])
-                X.iloc[:,col] = (X.iloc[:,col] - avg) / var
-        return X
+def normalize(data):	
+    count_uniq_val = data.apply(lambda x:len(x.unique()))
+    normalize_columns = list(count_uniq_val[(count_uniq_val > 2)].index)
+    normalize_data = data[normalize_columns]
+    data[normalize_columns] = (normalize_data - normalize_data.mean()) / normalize_data.std()
+    return data
 
-def cross_validation(data, learning_rate=0.00005, nsteps=3000, e=0.000000001, weight_low=0, weight_high=1, kweigths=1):        
+def cross_validation(data, learning_rate=0.05, nsteps=3000, e=0.0001, weight_low=0, weight_high=1, kweigths=1):        
         results = []
-        X = normalize(data)
-        trains, tests = create_chuncks(X)    
+        trains, tests = create_chuncks(data)    
         
         X_trains = []
         y_trains = []
@@ -37,48 +35,47 @@ def cross_validation(data, learning_rate=0.00005, nsteps=3000, e=0.000000001, we
         y_tests = []   
         X_tests = []
                   
-        for i in range(5):                     
+        for i in range(5): 
             y_trains.append(trains[i].iloc[:,trains[i].shape[1] - 1])       
-            X_trains.append(trains[i].drop('Target', axis=1))
+            X_trains.append(normalize(trains[i].drop('Target', axis=1)))
             y_tests.append(tests[i].iloc[:,tests[i].shape[1] - 1])       
-            X_tests.append(tests[i].drop('Target', axis=1))
+            X_tests.append(normalize(tests[i].drop('Target', axis=1)))
 
-            m = X_trains[i].shape[0]
+            m = X_trains[i].shape[0]                        
+
+            X_trains[i] = np.hstack((np.ones(m).reshape(m, 1), X_trains[i]))            
+            X_tests[i] = np.hstack((np.ones(X_tests[i].shape[0]).reshape(X_tests[i].shape[0], 1), X_tests[i]))
+
             n = X_trains[i].shape[1]
-            W = []
-            
-            X = np.array(X_trains[i])
-            y_train = np.array(y_trains[i])
 
-            for j in range(1,m):          
-                X1 = X[j - 1:j].T.reshape(n, 1)
-                W = np.random.randint(low = -100, high = 100, size = (1, n))
-                y_pred = np.dot(W, X1)
-                cost0 = math.fabs(y_train[j - 1] - y_pred)
-                k = 0
-                while True:
-                    dy = float(y_pred - y_train[j - 1])
-                    W_tmp = W
-                    s = np.dot(dy, X1)   
-                    
-                    # Gradient descent step
-                    dW = 2 * learning_rate * s / m
-                    W = W - dW.T
-                    y_pred = np.dot(W, X1)
-                    cost1 = math.fabs(y_train[j - 1] - y_pred)
-                    
-                    k += 1
-                    
-                    if (cost1 > cost0):
-                        W = W_tmp
-                        break 
-                    
-                    if ((cost0 - cost1) < e) or (k == nsteps):
-                        break
-                    
-                    cost0 = cost1
-                    if(learning_rate - 0.000001 > 0):
-                        learning_rate -= 0.000001
+            X = np.array(X_trains[i])
+            y_train = np.array(y_trains[i]).reshape(m, 1)
+
+            W = np.random.random_sample(size=(n, 1))
+            y_pred = np.dot(X, W).reshape(m, 1)
+            cost0 = np.sum((y_pred-y_train)**2)/(len(y_train))
+            k = 0                
+            while True:
+                dy = y_pred - y_train
+                W_tmp = W
+                s = np.dot(dy.T, X).reshape(n, 1)
+                
+                # Gradient descent step
+                dW = learning_rate * 2 / m * s
+                W = W - dW
+                y_pred = np.dot(X, W)
+                cost1 = np.sum((y_pred-y_train)**2)/(len(y_train))
+                k += 1
+                
+                if (cost1 > cost0):
+                    W = W_tmp
+                    break
+                
+                if ((cost0 - cost1) < e) or (k == nsteps):
+                    break
+                
+                cost0 = cost1
+
             results.append(W)
 
         return results, y_trains, X_trains, y_tests, X_tests
@@ -86,7 +83,4 @@ def cross_validation(data, learning_rate=0.00005, nsteps=3000, e=0.000000001, we
 def predict(X, W):
         n = X.shape[0]
         X1 = np.array(X)
-        res = []
-        for i in range(n):
-            res.append(np.dot(W, X1[i]))
-        return res
+        return np.dot(X1, W)
