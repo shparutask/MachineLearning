@@ -28,6 +28,34 @@ def normalize(data):
 def gradient_descent_step(X, dy, learning_rate, m, n, W):
     return W - learning_rate * 2 / m * np.dot(dy.T, X).reshape(n, 1)
 
+def linear_regression(X, y_train, learning_rate, n, m, e, nsteps): 
+    W = np.random.random_sample(size=(n, 1))
+    y_pred = np.dot(X, W).reshape(m, 1)
+    cost0 = np.sum((y_pred - y_train) ** 2) / (len(y_train))
+    k = 0  
+    while True:
+        dy = y_pred - y_train
+        W_tmp = W
+        
+        # Gradient descent step
+        W = gradient_descent_step(X, dy, learning_rate, m, n, W)
+        y_pred = np.dot(X, W)
+        cost1 = np.sum((y_pred - y_train) ** 2) / (len(y_train))
+        k += 1
+        
+        if (cost1 > cost0):
+            W = W_tmp
+            break
+        
+        if ((cost0 - cost1) < e) or (k == nsteps):
+            break
+        
+        cost0 = cost1
+        learning_rate -= e*k
+    
+    return W
+
+
 def cross_validation(data, learning_rate=0.05, nsteps=3000, e=0.000000001, weight_low=0, weight_high=1, kweigths=1):        
         results = []
         trains, tests = create_chuncks(data)    
@@ -54,33 +82,7 @@ def cross_validation(data, learning_rate=0.05, nsteps=3000, e=0.000000001, weigh
             X = np.array(X_trains[i])
             y_train = np.array(y_trains[i]).reshape(m, 1)
 
-            W = np.random.random_sample(size=(n, 1))
-            y_pred = np.dot(X, W).reshape(m, 1)
-            cost0 = np.sum((y_pred-y_train)**2)/(len(y_train))
-            k = 0                
-            while True:
-                dy = y_pred - y_train
-                W_tmp = W
-               # s = np.dot(dy.T, X).reshape(n, 1)
-                
-                # Gradient descent step
-                #dW = learning_rate * 2 / m * s
-                W = gradient_descent_step(X, dy, learning_rate, m, n, W)  #W - dW
-                y_pred = np.dot(X, W)
-                cost1 = np.sum((y_pred-y_train)**2)/(len(y_train))
-                k += 1
-                
-                if (cost1 > cost0):
-                    W = W_tmp
-                    break
-                
-                if ((cost0 - cost1) < e) or (k == nsteps):
-                    break
-                
-                cost0 = cost1
-                learning_rate -= e*k
-
-            results.append(W)
+            results.append(linear_regression(X, y_train, learning_rate, n, m, e, nsteps))
 
         return results, y_trains, X_trains, y_tests, X_tests
 
