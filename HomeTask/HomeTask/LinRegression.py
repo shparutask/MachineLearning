@@ -25,7 +25,10 @@ def normalize(data):
     data[normalize_columns] = (normalize_data - normalize_data.mean()) / normalize_data.std()
     return data
 
-def cross_validation(data, learning_rate=0.05, nsteps=3000, e=0.0001, weight_low=0, weight_high=1, kweigths=1):        
+def gradient_descent_step(X, dy, learning_rate, m, n, W):
+    return W - learning_rate * 2 / m * np.dot(dy.T, X).reshape(n, 1)
+
+def cross_validation(data, learning_rate=0.05, nsteps=3000, e=0.000000001, weight_low=0, weight_high=1, kweigths=1):        
         results = []
         trains, tests = create_chuncks(data)    
         
@@ -58,11 +61,11 @@ def cross_validation(data, learning_rate=0.05, nsteps=3000, e=0.0001, weight_low
             while True:
                 dy = y_pred - y_train
                 W_tmp = W
-                s = np.dot(dy.T, X).reshape(n, 1)
+               # s = np.dot(dy.T, X).reshape(n, 1)
                 
                 # Gradient descent step
-                dW = learning_rate * 2 / m * s
-                W = W - dW
+                #dW = learning_rate * 2 / m * s
+                W = gradient_descent_step(X, dy, learning_rate, m, n, W)  #W - dW
                 y_pred = np.dot(X, W)
                 cost1 = np.sum((y_pred-y_train)**2)/(len(y_train))
                 k += 1
@@ -75,6 +78,7 @@ def cross_validation(data, learning_rate=0.05, nsteps=3000, e=0.0001, weight_low
                     break
                 
                 cost0 = cost1
+                learning_rate -= e*k
 
             results.append(W)
 

@@ -10,7 +10,7 @@ FILENAME_WRITE = "../Dataset/Training/table.csv"
 if __name__ == "__main__":    
     data = pd.read_csv(FILENAME_READ)
     data = data.drop('Unnamed: 0', axis=1)
-    columns = data.columns
+    columns = data.drop('Target', axis=1).columns
 
     weights, y_trains, X_trains, y_tests, X_tests = lr.cross_validation(data)
     
@@ -32,5 +32,5 @@ if __name__ == "__main__":
     data_write["E"] = data_write[["T1", "T2", "T3", "T4", "T5"]].mean(axis=1)
     data_write["STD"] = data_write[["T1", "T2", "T3", "T4", "T5"]].std(axis=1)
 
-    data_write.index = ["R^2_test", "R^2_train", "RMSE_test", "RMSE_train"] + list(columns)
+    data_write.index = ["R^2_test", "R^2_train", "RMSE_test", "RMSE_train"] + list(columns) + list(["1"])
     data_write.to_csv("result.csv")
