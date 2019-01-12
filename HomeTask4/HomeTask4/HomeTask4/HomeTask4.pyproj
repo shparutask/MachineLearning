@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>44a3f9ae-8306-4e37-b65a-2c63560720e8</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>images.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -26,10 +26,13 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="dataset.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="elu.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="images.py">
+    <Compile Include="main.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="leaky_ReLU.py">
@@ -39,6 +42,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="logSoftMax.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="networks.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="softplus.py">
@@ -75,9 +81,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="sequence_container.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="test1.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="toy_example.py">

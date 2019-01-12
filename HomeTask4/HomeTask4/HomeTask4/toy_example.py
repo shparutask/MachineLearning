@@ -47,7 +47,7 @@ optimizer_state = {}
 
 # Looping params
 n_epoch = 20
-batch_size = 128
+batch_size = 60000
 
 # batch generator
 def get_batches(dataset, batch_size):
@@ -92,12 +92,12 @@ for i in range(n_epoch):
         loss_history.append(loss)
 
     # Visualize
-    display.clear_output(wait=True)
-    plt.figure(figsize=(8, 6))
+    #display.clear_output(wait=True)
+    #plt.figure(figsize=(8, 6))
         
-    plt.title("Training loss")
-    plt.xlabel("#iteration")
-    plt.ylabel("loss")
+    #plt.title("Training loss")
+    #plt.xlabel("#iteration")
+    #plt.ylabel("loss")
    # plt.plot(loss_history, 'b')
    # plt.show()
     

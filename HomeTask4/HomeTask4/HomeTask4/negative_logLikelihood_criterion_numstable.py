@@ -7,11 +7,11 @@ class ClassNLLCriterion(crit.Criterion):
         super(ClassNLLCriterion, self).__init__()
         
     def updateOutput(self, input, target): 
-        self.output = -np.sum(np.dot(target, input))/target.shape[0]
+        self.output = -np.sum(np.dot(input, target))/target.shape[0]
         return self.output
 
     def updateGradInput(self, input, target):
-        self.gradInput = np.sum(np.dot(target, np.ones(input.shape)))/target.shape[0]
+        self.gradInput = np.sum(np.dot(np.ones(input.shape), target))/target.shape[0]
         return self.gradInput
     
     def __repr__(self):

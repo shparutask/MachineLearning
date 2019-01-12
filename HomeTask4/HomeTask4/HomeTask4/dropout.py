@@ -13,14 +13,17 @@ class Dropout(mod.Module):
         
     def updateOutput(self, input):
         if(self.training):
-            self.mask = 1 / (1 - self.p)
-            self.output = np.where(input > 0, input/(1 - self.p), 0)
+            self.mask = (np.random.rand(*input.shape) < self.p) / self.p
+            self.output = np.multiply(input, self.mask)
         else:
             self.output = input
         return self.output
     
     def updateGradInput(self, input, gradOutput):
-        self.gradInput = np.multiply(gradOutput, self.mask)
+        if(self.training):
+            self.gradInput = input * self.mask
+        else:
+            self.gradInput = input
         return self.gradInput
         
     def __repr__(self):

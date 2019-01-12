@@ -10,13 +10,23 @@ class SoftMax(mod.Module):
     
     def updateOutput(self, input):
         # start with normalization for numerical stability
-        self.output = np.subtract(input, input.max(axis=1, keepdims=True))
-        self.output = np.exp(self.output) / np.sum(np.exp(self.output))
+        z = np.subtract(input, input.max(axis=1, keepdims=True))
+        z -= np.max(z)
+        self.output = (np.exp(z).T / np.sum(np.exp(z), axis=0)).T
         return self.output
     
     def updateGradInput(self, input, gradOutput):
-        sum_exp = np.sum(np.exp(input))
-        self.gradInput = (sum_exp * input - np.square(input)) / sum_exp ** 2
+        s = input.reshape(-1,1)
+        self.gradInput = np.diagflat(s) - np.dot(s, s.T)  
+        
+        #self.gradInput = np.diag(input.reshape(input.shape[0]))
+          #for i in range(len(self.gradInput)):
+          #    for j in range(len(self.gradInput)):
+          #        if i == j:
+          #            self.gradInput[i][j] = input[i] * (1 - input[i])
+          #        else:
+          #            self.gradInput[i][j] = -input[i]*input[j]
+          #
         return self.gradInput
     
     def __repr__(self):

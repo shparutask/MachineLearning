@@ -16,7 +16,7 @@ class LogSoftMax(mod.Module):
         return self.output
     
     def updateGradInput(self, input, gradOutput):
-        self.gradInput = np.subtract(np.ones(input.shape[0]), 1/np.sum(gradOutput))
+        self.gradInput = np.subtract(np.ones(input.shape[0]), 1/np.sum(input))
         self.gradInput = self.gradInput.reshape(1, self.gradInput.shape[0])
         return self.gradInput
     
