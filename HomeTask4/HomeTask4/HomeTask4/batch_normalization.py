@@ -1,4 +1,5 @@
 import numpy as np
+
 import module as mod
 
 #input:  batch_size x n_feats
@@ -6,26 +7,40 @@ import module as mod
 
 class BatchNormalization(mod.Module):
     EPS = 1e-3
-    def __init__(self, alpha = 0.):
+    def __init__(self, alpha = 0.5):
         super(BatchNormalization, self).__init__()
         self.alpha = alpha
-        self.moving_mean = None 
-        self.moving_variance = None
+        self.moving_mean = 0 
+        self.moving_variance = 0
         
     def updateOutput(self, input):
+        # Your code goes here. #
         if(self.training):
-            batch_mean = np.mean(input)
-            batch_variance = np.var(input)
-            self.output = np.subtract(input, batch_mean)/np.sqrt(batch_variance + EPS)
-            self.moving_mean = self.moving_mean * alpha + batch_mean * (1 - alpha)
-            self.moving_variance = self.moving_variance * alpha + batch_variance * (1 - alpha)
+            batch_mean = np.mean(input, axis=0)
+            batch_variance = np.var(input, axis=0)   
+                    
+            self.output = np.subtract(input, batch_mean)/np.sqrt(batch_variance + self.EPS)
+            self.moving_mean = self.moving_mean * self.alpha + batch_mean * (1 - self.alpha)
+            self.moving_variance = self.moving_variance * self.alpha + batch_variance * (1 - self.alpha)
         else:
             self.output = np.subtract(input, self.moving_mean)/self.moving_variance
-
+        ###############################################
+        # use self.EPS please
+        
         return self.output
     
     def updateGradInput(self, input, gradOutput):
-        self.gradInput = gradOutput * self.alpha
+        # Your code goes here. #        
+        batch_mean = np.mean(input, axis=0)
+        batch_variance = np.var(input, axis=0)
+        
+        inputGrad = gradOutput / np.sqrt(batch_variance + self.EPS)
+        meanGrad = -np.sum(inputGrad, axis = 0) / input.shape[0]
+        varGgrad = -np.subtract(input, batch_mean)/ input.shape[0] * np.sum(gradOutput * np.divide(input - batch_mean,(batch_variance + self.EPS)**1.5), axis=0)  
+        
+        self.gradInput = inputGrad + meanGrad + varGgrad  
+        ###############################################
+
         return self.gradInput
     
     def __repr__(self):

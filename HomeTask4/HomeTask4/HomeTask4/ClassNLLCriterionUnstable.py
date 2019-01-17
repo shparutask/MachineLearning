@@ -1,5 +1,11 @@
 import numpy as np
-import criterion as crit
+from math import log
+
+import Criterion as crit
+
+#input:  batch_size x n_feats - probabilities
+#target: batch_size x n_feats - one-hot representation of ground truth
+#output: scalar
 
 class ClassNLLCriterionUnstable(crit.Criterion):
     EPS = 1e-15
@@ -11,16 +17,22 @@ class ClassNLLCriterionUnstable(crit.Criterion):
         
         # Use this trick to avoid numerical errors
         input_clamp = np.clip(input, self.EPS, 1 - self.EPS)
+
+        # Your code goes here. #
+        self.output = -np.mean(np.log(input_clamp) * target)
+        ###############################################
         
-        self.output = -np.sum(np.multiply(target, np.log(input)))/target.shape[0]
         return self.output
 
     def updateGradInput(self, input, target):
         
         # Use this trick to avoid numerical errors
         input_clamp = np.clip(input, self.EPS, 1 - self.EPS)
-                
-        self.gradInput = np.sum(np.multiply(target, 1/input))/target.shape[0]
+
+        # Your code goes here. #
+        self.gradInput = - target / target.shape[0]
+        ###############################################
+        
         return self.gradInput
     
     def __repr__(self):

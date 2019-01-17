@@ -1,4 +1,5 @@
 import numpy as np
+
 import module as mod
 
 class ReLU(mod.Module):

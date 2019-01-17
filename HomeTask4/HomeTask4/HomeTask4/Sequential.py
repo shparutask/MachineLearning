@@ -1,4 +1,5 @@
 import numpy as np
+
 import module as mod
 
 class Sequential(mod.Module):
@@ -10,7 +11,6 @@ class Sequential(mod.Module):
     def __init__ (self):
         super(Sequential, self).__init__()
         self.modules = []
-        self.y = []
    
     def add(self, module):
         #Adds a module to the container.
@@ -24,17 +24,18 @@ class Sequential(mod.Module):
         #    y_1    = module[1].forward(y_0)
         #    ...
         #    output = module[n-1].forward(y_{n-2})   
-            
-            
-        #Just write a little loop. 
-        self.y.append(self.modules[0].forward(input))
+                        
+        #Just write a little loop.
+       
+        # Your code goes here. #
+        self.output = self.modules[0].forward(input)
 
         for i in range(1, len(self.modules)):
-           self.y.append(self.modules[i].forward(self.y[i - 1]))
+            self.output = self.modules[i].forward(self.output)
+        ###############################################
 
-        self.output = self.y[len(self.modules) - 1]
         return self.output
-
+ 
     def backward(self, input, gradOutput):
         #Workflow of BACKWARD PASS:
         #    
@@ -53,15 +54,18 @@ class Sequential(mod.Module):
         #and NOT `input` to this Sequential module. 
         
         #!!!
+        
+        # Your code goes here. #
         n = len(self.modules)
 
-        self.gradInput = self.modules[n - 1].backward(self.y[n - 2], gradOutput)
-
+        self.gradInput = self.modules[n - 1].backward(self.modules[n - 2].output, gradOutput)
 
         for i in range(n - 2, 0, -1):
-            self.gradInput = self.modules[i].backward(self.y[i - 1], self.gradInput)
+            self.gradInput = self.modules[i].backward(self.modules[i - 1].output, self.gradInput)
 
-        self.gradInput = self.modules[0].backward(input, self.gradInput)
+        self.gradInput = self.modules[0].backward(input, self.gradInput)        
+        ###############################################
+
         return self.gradInput
       
     def zeroGradParameters(self): 

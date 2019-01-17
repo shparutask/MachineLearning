@@ -26,61 +26,35 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="dataset.py">
+    <Compile Include="Batch_Normalization.py" />
+    <Compile Include="ClassNLLCriterionUnstable.py" />
+    <Compile Include="dataset.py" />
+    <Compile Include="Dropout.py" />
+    <Compile Include="elu.py" />
+    <Compile Include="Helper.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="elu.py">
+    <Compile Include="leaky_ReLU.py" />
+    <Compile Include="Linear.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="main.py">
+    <Compile Include="Criterion.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="leaky_ReLU.py">
+    <Compile Include="main.py" />
+    <Compile Include="MSECriterion.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="linear_transform_layer.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="logSoftMax.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="networks.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="softplus.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="criterion.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="mse_criterion.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="negative_logLikelihood_criterion.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="negative_logLikelihood_criterion_numstable.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="batch_normalization.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="dropout.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="softmax.py">
+    <Compile Include="networks.py" />
+    <Compile Include="ReLU.py" />
+    <Compile Include="Soft_Plus.py" />
+    <Compile Include="Soft_Max.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="module.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="optimizer.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ReLU.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="sequence_container.py">
+    <Compile Include="Sequential.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="toy_example.py">

@@ -1,6 +1,8 @@
 import numpy as np
 
-class MSECriterion(Criterion):
+import Criterion as crit
+
+class MSECriterion(crit.Criterion):
     def __init__(self):
         super(MSECriterion, self).__init__()
         

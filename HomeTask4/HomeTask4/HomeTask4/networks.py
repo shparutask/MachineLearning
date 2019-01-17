@@ -1,104 +1,83 @@
-import linear_transform_layer as lin
-import softmax as lsm
-import sequence_container as seq
-import ReLU as r
-import negative_logLikelihood_criterion_numstable as nlls
-import dropout as drop
 import numpy as np
-import optimizer as opt
-from IPython import display
-import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score
 
-# Optimizer params
-optimizer_config = {'learning_rate' : 1e-1, 'momentum': 0.9}
-optimizer_state = {}
+import Sequential as seq
 
-#Basic training loop. Examine it.
-loss = 0
+import Linear as linear
+import Soft_Max as softMax
+import Batch_Normalization as batch
+import Dropout as drop
 
-# batch generator
-def get_batches(dataset, batch_size):
-    X, Y = dataset
-    n_samples = X.shape[0]
-        
-    # Shuffle at the start of epoch
-    indices = np.arange(n_samples)
-    np.random.shuffle(indices)
-    
-    for start in range(batch_size):
-        #end = min(start + batch_size, n_samples)
-        
-        batch_idx = indices[start]
-    
-        yield X[batch_idx], Y[batch_idx]
+import ReLU as r
+import elu as elu
+import leaky_ReLU as leaky
+import Soft_Plus as softPlus
 
-def loss_acc_net(network, batch_size, n_epoch, X, Y, criterion):
-    losses = ""
-    accs = ""
-    for i in range(n_epoch):
-        loss_history = []
-        acc = 0
-        j = 0
-        for x_batch, y_batch in get_batches((X, Y), batch_size):
-            network.zeroGradParameters()
-        
-            # Forward
-            predictions = network.forward(x_batch)
-            loss = criterion.forward(predictions, y_batch)
-            pred = list(predictions).index(max(predictions))
-            
-            if(pred == y_batch):
-                acc+=1
+def get_Networks(data_size, predict_size):    
+    ReLU_net = seq.Sequential()
+    ReLU_net.add(linear.Linear(data_size, 100))
+    ReLU_net.add(r.ReLU())
+    ReLU_net.add(linear.Linear(100, 50))
+    ReLU_net.add(r.ReLU())
+    ReLU_net.add(linear.Linear(50, predict_size))
+    ReLU_net.add(softMax.SoftMax())
 
-            # Backward
-            dp = criterion.backward(predictions, y_batch)
-            pred = network.backward(x_batch, dp)
+    ELU_net = seq.Sequential()
+    ELU_net.add(linear.Linear(data_size, predict_size))
+    ELU_net.add(elu.ELU())
+    ELU_net.add(softMax.SoftMax())
 
-            par = network.getParameters()
-            gradPar = network.getGradParameters()
+    LeakyReLU_net = seq.Sequential()
+    LeakyReLU_net.add(linear.Linear(data_size, 400))
+    LeakyReLU_net.add(leaky.LeakyReLU())
+    LeakyReLU_net.add(linear.Linear(400, 250))
+    LeakyReLU_net.add(leaky.LeakyReLU())
+    LeakyReLU_net.add(linear.Linear(250, predict_size))
+    LeakyReLU_net.add(leaky.LeakyReLU())
+    LeakyReLU_net.add(softMax.SoftMax())
 
-            # Update weights
-            opt.sgd_momentum(par, 
-                     gradPar, 
-                     optimizer_config,
-                     optimizer_state)      
-        
-            loss_history.append(abs(loss)) 
-            j+=1
+    SoftPlus_net = seq.Sequential()
+    SoftPlus_net.add(linear.Linear(data_size, 30))
+    SoftPlus_net.add(softPlus.SoftPlus())
+    SoftPlus_net.add(linear.Linear(30, predict_size))
+    SoftPlus_net.add(softMax.SoftMax())
 
-            display.clear_output(wait=True)
-            plt.figure(figsize=(8, 6))
-        
-            plt.title("Training loss")
-            plt.xlabel("#iteration")
-            plt.ylabel("loss")
-            plt.plot(loss_history, 'b')
-            plt.show()
+    return ReLU_net, ELU_net, LeakyReLU_net, SoftPlus_net
 
-        losses += str(round(np.mean(np.array(loss_history)), 2)) + ";\t"
-        accs += str(round(acc/60000, 10)) + ";\t"
-    return losses, accs
+def get_Networks_with_batch(data_size, predict_size):    
+    ReLU_net = seq.Sequential()
+    ReLU_net.add(linear.Linear(data_size, 100))
+    ReLU_net.add(batch.BatchNormalization(0.3))
+    ReLU_net.add(batch.ChannelwiseScaling(100))
+    ReLU_net.add(r.ReLU())
+    ReLU_net.add(linear.Linear(100, predict_size))
+    ReLU_net.add(softMax.SoftMax())
 
-def get_Networks():    
-    criterion = nlls.ClassNLLCriterion()
+    ELU_net = seq.Sequential()
+    ELU_net.add(linear.Linear(data_size, predict_size))
+    ELU_net.add(batch.BatchNormalization())
+    ELU_net.add(batch.ChannelwiseScaling(predict_size))
+    ELU_net.add(elu.ELU())
+    ELU_net.add(softMax.SoftMax())
 
-    net_3layer_dropout = seq.Sequential()
-    net_3layer_dropout.add(lsm.SoftMax())
-    net_3layer_dropout.add((drop.Dropout()))
-    net_3layer_dropout.add(lin.Linear(784, 10))
+    return ReLU_net, ELU_net
 
-    net_2layer_dropout = seq.Sequential()
-    net_2layer_dropout.add(lsm.SoftMax())
-    net_2layer_dropout.add((drop.Dropout()))
+def get_Networks_witn_Dropout(data_size, predict_size):    
+    ReLU_net = seq.Sequential()
+    ReLU_net.add(linear.Linear(data_size, 100))
+    ReLU_net.add(batch.BatchNormalization(0.3))
+    ReLU_net.add(batch.ChannelwiseScaling(100))
+    ReLU_net.add(r.ReLU())
+    ReLU_net.add(drop.Dropout())
+    ReLU_net.add(linear.Linear(100, predict_size))
+    ReLU_net.add(softMax.SoftMax())
 
-    net_2layer = seq.Sequential()
-    net_2layer.add(lsm.SoftMax())
-    net_2layer.add(lin.Linear(784, 10))
-    
-    net_3layer = seq.Sequential()
-    net_3layer.add(r.ReLU())
-    net_3layer.add(lsm.SoftMax())
-    net_3layer.add(lin.Linear(784, 10))
-    
-    return criterion, net_3layer, net_3layer_dropout, net_2layer, net_2layer_dropout
+    ELU_net = seq.Sequential()
+    ELU_net.add(linear.Linear(data_size, predict_size))
+    ELU_net.add(batch.BatchNormalization())
+    ELU_net.add(batch.ChannelwiseScaling(predict_size))
+    ELU_net.add(elu.ELU())
+    ELU_net.add(drop.Dropout())
+    ELU_net.add(linear.Linear(predict_size, predict_size))
+    ELU_net.add(softMax.SoftMax())
+
+    return ReLU_net, ELU_net

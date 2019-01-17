@@ -1,13 +1,13 @@
 import numpy as np
-import module as mod
 
+import module as mod
 
 #input:  batch_size x n_feats1
 #output: batch_size x n_feats2
 
 class Linear(mod.Module):
-    #A module which applies a linear transformation 
-    #A common name is fully-connected layer, InnerProductLayer in caffe. 
+    # A module which applies a linear transformation 
+    # A common name is fully-connected layer, InnerProductLayer in caffe. 
     
     #The module should work with 2D input of shape (n_samples, n_feature).
     
@@ -23,18 +23,36 @@ class Linear(mod.Module):
         self.gradb = np.zeros_like(self.b)
         
     def updateOutput(self, input):
-        self.output = np.add(np.dot(self.W, input).reshape(self.b.shape), self.b)
-        self.output = self.output.reshape(self.output.shape[0], 1)
+        # Your code goes here. #
+        N = input.shape[0]
+        reshaped_input =  input.reshape(N, -1)
+        out = np.add(np.dot(reshaped_input, self.W.T), self.b)
+        ###############################################
+        
+        self.output = out
         return self.output
+    
+    def updateGradInput(self, input, gradOutput):
+        # Your code goes here. #
+        N = input.shape[0]
+        dx = np.dot(gradOutput, self.W)
+        dx = dx.reshape(input.shape)
+        ###############################################
 
-    def updateGradInput(self, input, gradOutput):       
-        self.gradInput = np.dot(gradOutput, self.gradW)
+        self.gradInput = dx
         return self.gradInput
     
     def accGradParameters(self, input, gradOutput):
-        self.gradW = input.reshape(input.shape[0], -1).dot(gradOutput).T
-        self.gradb = np.sum(gradOutput, axis=0)
-        return self.gradW, self.gradb
+        # Your code goes here. #
+        N = input.shape[0]
+        reshaped_input = input.reshape(N, -1)
+        dw = reshaped_input.T.dot(gradOutput).T
+        db = np.sum(gradOutput, axis=0)
+        ###############################################
+        
+        self.gradW = dw
+        self.gradb = db
+        pass
     
     def zeroGradParameters(self):
         self.gradW.fill(0)

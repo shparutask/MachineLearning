@@ -1,5 +1,6 @@
-import module as mod
 import numpy as np
+
+import module as mod
 
 class LeakyReLU(mod.Module):
     def __init__(self, slope = 0.03):
@@ -8,11 +9,17 @@ class LeakyReLU(mod.Module):
         self.slope = slope
         
     def updateOutput(self, input):
-        self.output = np.where(input > 0, input, slope * input)
+        # Your code goes here. #
+        self.output = np.where(input > 0, input, self.slope * input)
+        ###############################################
+
         return  self.output
     
     def updateGradInput(self, input, gradOutput):
-        self.gradInput = np.where(input > 0, 1, slope)
+        # Your code goes here. # 
+        self.gradInput = np.where(input > 0, 1, self.slope)
+        ###############################################
+
         return self.gradInput
     
     def __repr__(self):
