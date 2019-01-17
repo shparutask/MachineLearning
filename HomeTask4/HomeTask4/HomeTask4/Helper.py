@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from IPython import display
+from sklearn.metrics import accuracy_score
 
 # Optimizer params
 optimizer_config = {'learning_rate' : 1e-1, 'momentum': 0.9}
@@ -48,15 +49,18 @@ def get_batches(dataset, batch_size):
 
 def run_network(X, Y, net, criterion, n_epoch, batch_size):       
     loss_history = []
-    for i in range(n_epoch):   
-        for x_batch, y_batch in get_batches((X, Y), batch_size):
+    acc_history = []
+    for i in range(n_epoch):
+        for x_batch, y_batch, in get_batches((X, Y), batch_size):
             
             net.zeroGradParameters()
         
             # Forward
             predictions = net.forward(x_batch)
             loss = criterion.forward(predictions, y_batch)
-    
+                        
+            acc = accuracy_score(np.argmax(y_batch, axis=1), np.argmax(predictions, axis=1))
+
             # Backward
             dp = criterion.backward(predictions, y_batch)
             net.backward(x_batch, dp)
@@ -68,16 +72,25 @@ def run_network(X, Y, net, criterion, n_epoch, batch_size):
                      optimizer_state)      
         
         loss_history.append(loss)
-        
+        acc_history.append(acc)
+
         print('Current loss: ')
         print(loss)
+        print('Current accuracy: ')
+        print(acc)
        
     # Visualize
     display.clear_output(wait=True)
     plt.figure(figsize=(8, 6))
         
-    plt.title("Training loss")
-    plt.xlabel("#iteration")
+    plt.title("Loss")
+    plt.xlabel("Epoch")
     plt.ylabel("loss")
     plt.plot(loss_history, 'b')
+    plt.show()
+
+    plt.title("Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("acc")
+    plt.plot(acc_history, 'b')
     plt.show()

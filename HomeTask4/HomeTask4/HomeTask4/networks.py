@@ -22,17 +22,15 @@ def get_Networks(data_size, predict_size):
     ReLU_net.add(softMax.SoftMax())
 
     ELU_net = seq.Sequential()
-    ELU_net.add(linear.Linear(data_size, predict_size))
+    ELU_net.add(linear.Linear(data_size, 35))
     ELU_net.add(elu.ELU())
+    ELU_net.add(linear.Linear(35, predict_size))
     ELU_net.add(softMax.SoftMax())
 
     LeakyReLU_net = seq.Sequential()
-    LeakyReLU_net.add(linear.Linear(data_size, 400))
+    LeakyReLU_net.add(linear.Linear(data_size, 40))
     LeakyReLU_net.add(leaky.LeakyReLU())
-    LeakyReLU_net.add(linear.Linear(400, 250))
-    LeakyReLU_net.add(leaky.LeakyReLU())
-    LeakyReLU_net.add(linear.Linear(250, predict_size))
-    LeakyReLU_net.add(leaky.LeakyReLU())
+    LeakyReLU_net.add(linear.Linear(40, predict_size))
     LeakyReLU_net.add(softMax.SoftMax())
 
     SoftPlus_net = seq.Sequential()
@@ -72,12 +70,12 @@ def get_Networks_witn_Dropout(data_size, predict_size):
     ReLU_net.add(softMax.SoftMax())
 
     ELU_net = seq.Sequential()
-    ELU_net.add(linear.Linear(data_size, predict_size))
+    ELU_net.add(linear.Linear(data_size, 50))
     ELU_net.add(batch.BatchNormalization())
-    ELU_net.add(batch.ChannelwiseScaling(predict_size))
+    ELU_net.add(batch.ChannelwiseScaling(50))
     ELU_net.add(elu.ELU())
     ELU_net.add(drop.Dropout())
-    ELU_net.add(linear.Linear(predict_size, predict_size))
+    ELU_net.add(linear.Linear(50, predict_size))
     ELU_net.add(softMax.SoftMax())
 
     return ReLU_net, ELU_net

@@ -10,14 +10,14 @@ class LeakyReLU(mod.Module):
         
     def updateOutput(self, input):
         # Your code goes here. #
-        self.output = np.where(input > 0, input, self.slope * input)
+        self.output = np.where(input > 0, input, input * (self.slope - 1) + 1)
         ###############################################
 
         return  self.output
     
     def updateGradInput(self, input, gradOutput):
         # Your code goes here. # 
-        self.gradInput = np.where(input > 0, 1, self.slope)
+        self.gradInput = np.where(input > 0, gradOutput,  input*(self.slope - 1) + 1)
         ###############################################
 
         return self.gradInput

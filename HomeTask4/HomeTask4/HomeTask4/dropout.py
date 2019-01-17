@@ -15,7 +15,7 @@ class Dropout(mod.Module):
     def updateOutput(self, input):
         # Your code goes here. #
         if(self.training):
-            self.mask = (np.random.rand(*input.shape) < self.p) / self.p
+            self.mask = (np.random.uniform(0, 1, size=input.shape) < self.p) / self.p
             self.output = np.multiply(input, self.mask)
         else:
             self.output = input
@@ -26,7 +26,7 @@ class Dropout(mod.Module):
     def updateGradInput(self, input, gradOutput):
         # Your code goes here. #
         if(self.training):
-            self.gradInput = input * self.mask
+            self.gradInput = self.mask / self.p * gradOutput
         else:
             self.gradInput = input
         ###############################################
