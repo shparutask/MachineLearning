@@ -30,7 +30,7 @@ class ClassNLLCriterionUnstable(crit.Criterion):
         input_clamp = np.clip(input, self.EPS, 1 - self.EPS)
 
         # Your code goes here. #
-        self.gradInput = - target / target.shape[0]
+        self.gradInput = - (target / input_clamp) / input.shape[0]
         ###############################################
         
         return self.gradInput

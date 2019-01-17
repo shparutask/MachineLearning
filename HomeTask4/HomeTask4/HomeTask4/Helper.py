@@ -47,9 +47,8 @@ def get_batches(dataset, batch_size):
     
         yield X[batch_idx], Y[batch_idx]
 
-def run_network(X, Y, net, criterion, n_epoch, batch_size):       
+def train_network(X, Y, net, criterion, n_epoch, batch_size):       
     loss_history = []
-    acc_history = []
     for i in range(n_epoch):
         for x_batch, y_batch, in get_batches((X, Y), batch_size):
             
@@ -58,8 +57,6 @@ def run_network(X, Y, net, criterion, n_epoch, batch_size):
             # Forward
             predictions = net.forward(x_batch)
             loss = criterion.forward(predictions, y_batch)
-                        
-            acc = accuracy_score(np.argmax(y_batch, axis=1), np.argmax(predictions, axis=1))
 
             # Backward
             dp = criterion.backward(predictions, y_batch)
@@ -72,12 +69,9 @@ def run_network(X, Y, net, criterion, n_epoch, batch_size):
                      optimizer_state)      
         
         loss_history.append(loss)
-        acc_history.append(acc)
 
         print('Current loss: ')
         print(loss)
-        print('Current accuracy: ')
-        print(acc)
        
     # Visualize
     display.clear_output(wait=True)
@@ -89,6 +83,27 @@ def run_network(X, Y, net, criterion, n_epoch, batch_size):
     plt.plot(loss_history, 'b')
     plt.show()
 
+    
+def test_network(X, Y, net, criterion, n_epoch, batch_size):       
+    loss_history = []
+    acc_history = []
+    for i in range(n_epoch):
+        for x_batch, y_batch, in get_batches((X, Y), batch_size):
+            
+            net.zeroGradParameters()
+        
+            # Forward
+            predictions = net.forward(x_batch)                       
+            acc = accuracy_score(np.argmax(y_batch, axis=1), np.argmax(predictions, axis=1))
+        
+        acc_history.append(acc)
+
+        print('Current accuracy: ')
+        print(acc)
+       
+    # Visualize
+    display.clear_output(wait=True)
+    plt.figure(figsize=(8, 6))
     plt.title("Accuracy")
     plt.xlabel("Epoch")
     plt.ylabel("acc")
